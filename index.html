@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kwartz Consulting — Your Dedicated AI Enablement Team</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root, [data-theme="dark"] {
+    --bg: #0a0c10;
+    --surface: #12161c;
+    --border: #1e2530;
+    --text: #e4e8ef;
+    --muted: #8b95a5;
+    --accent: #22d3ee;
+    --accent-glow: rgba(34, 211, 238, 0.12);
+  }
+
+  [data-theme="light"] {
+    --bg: #f6f9fc;
+    --surface: #ffffff;
+    --border: #c4cdd8;
+    --text: #0f172a;
+    --muted: #475569;
+    --accent: #0891b2;
+    --accent-glow: rgba(8, 145, 178, 0.08);
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  .deck { height: 100vh; width: 100vw; position: relative; }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6vw 10vw 5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+
+  .slide.active { opacity: 1; pointer-events: all; }
+
+  .slide-number {
+    position: fixed;
+    bottom: 2rem;
+    right: 3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+  }
+
+  h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+
+  p, li {
+    font-size: clamp(1rem, 1.8vw, 1.35rem);
+    line-height: 1.7;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  ul { list-style: none; margin-top: 1rem; }
+
+  ul li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+  }
+
+  ul li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: translateY(-50%);
+  }
+
+  .accent { color: var(--accent); }
+  .muted-inline { color: var(--muted); font-weight: 300; }
+
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent);
+    border: 1px solid var(--border);
+    background: var(--accent-glow);
+    padding: 0.3rem 0.8rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+  }
+
+  .big-number {
+    font-size: clamp(5rem, 12vw, 10rem);
+    font-weight: 700;
+    color: var(--accent);
+    opacity: 0.15;
+    position: absolute;
+    right: 8vw;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 1;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .divider {
+    width: 60px;
+    height: 3px;
+    background: var(--accent);
+    margin: 1.5rem 0;
+    border-radius: 2px;
+  }
+
+  .progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: var(--accent);
+    transition: width 0.4s ease;
+    z-index: 100;
+  }
+
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 2rem;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    z-index: 200;
+  }
+
+  .nav-bar .slide-number {
+    position: static;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .nav-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 0.5rem 1.2rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 5rem;
+  }
+
+  .nav-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  .nav-btn:active {
+    transform: scale(0.96);
+  }
+
+  .site-logo {
+    animation: logo-float 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.3));
+    transition: filter 0.3s ease, transform 0.3s ease;
+  }
+
+  .site-logo:hover {
+    filter: drop-shadow(0 0 16px rgba(34, 211, 238, 0.6));
+    transform: scale(1.1);
+    animation-play-state: paused;
+  }
+
+  @keyframes logo-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  .theme-toggle {
+    position: fixed;
+    top: 1.5rem;
+    right: 2rem;
+    z-index: 200;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .theme-toggle:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  table {
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+    width: 100%;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0.6rem 1.2rem;
+    font-size: clamp(0.85rem, 1.4vw, 1.05rem);
+    border-bottom: 1px solid var(--border);
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  th {
+    color: var(--text);
+    font-weight: 600;
+    font-size: clamp(0.75rem, 1.2vw, 0.9rem);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td:last-child, th:last-child { text-align: right; }
+
+  tr.highlight td {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--text);
+    font-weight: 600;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.4);
+    border-top: 1px solid rgba(16, 185, 129, 0.4);
+  }
+
+  tr.total td {
+    border-top: 2px solid var(--accent);
+    border-bottom: none;
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 3rem;
+    margin-top: 1rem;
+  }
+
+  .two-col h3 {
+    font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .two-col ul { margin-top: 0; }
+
+  .two-col li {
+    font-size: clamp(0.85rem, 1.3vw, 1rem);
+    padding: 0.3rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .three-col h3 {
+    font-size: clamp(0.75rem, 1.1vw, 0.9rem);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .three-col .recommended h3 { color: var(--accent); }
+
+  .three-col table { font-size: clamp(0.7rem, 1vw, 0.85rem); }
+  .three-col th, .three-col td { padding: 0.35rem 0.6rem; }
+
+  .four-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 1.2rem;
+    margin-top: 1rem;
+  }
+
+  .plan-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .plan-card.recommended {
+    border-color: var(--border);
+    background: var(--surface);
+  }
+
+  .plan-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #fff;
+    background: #10b981;
+    padding: 0.25rem 0.7rem;
+    border-radius: 4px;
+    margin-left: 0.5rem;
+    vertical-align: middle;
+  }
+
+  .plan-card .plan-table-area {
+    flex: 1;
+  }
+
+  .plan-tagline {
+    font-size: clamp(0.9rem, 1.4vw, 1.1rem);
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    margin: 0.3rem 0 0.8rem;
+    padding: 0.5rem 0.8rem;
+    background: var(--accent-glow);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+  }
+
+  .plan-total {
+    font-size: clamp(1.2rem, 2vw, 1.6rem);
+    font-weight: 700;
+    color: var(--text);
+    margin: 0.5rem 0 0.3rem;
+  }
+
+  .plan-desc {
+    font-size: clamp(0.7rem, 1vw, 0.8rem);
+    color: var(--muted);
+    line-height: 1.5;
+    margin-top: 0.5rem;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 1.5rem;
+  }
+
+  .team-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: var(--surface);
+  }
+
+  .team-card h3 {
+    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .team-card p {
+    font-size: clamp(0.85rem, 1.3vw, 1rem);
+    line-height: 1.6;
+    color: var(--muted);
+  }
+
+  .team-card a {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .team-card a:hover { text-decoration: underline; }
+
+  .scope-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .scope-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem;
+    background: var(--surface);
+  }
+
+  .scope-card h3 {
+    font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  .scope-card ul { margin-top: 0.5rem; }
+
+  .scope-card li {
+    font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+    padding: 0.25rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .tool-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.2rem 1.5rem;
+    background: var(--surface);
+    margin-bottom: 1rem;
+  }
+
+  .tool-card h3 {
+    font-size: clamp(1rem, 1.5vw, 1.2rem);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+
+  .tool-card p {
+    font-size: clamp(0.85rem, 1.2vw, 1rem);
+    line-height: 1.6;
+  }
+
+  .workshop-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .workshop-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    background: var(--surface);
+  }
+
+  .workshop-card h3 {
+    font-size: clamp(0.85rem, 1.3vw, 1rem);
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+
+  .workshop-card p {
+    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+    line-height: 1.5;
+  }
+
+  .offer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .offer-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.5rem;
+    background: var(--surface);
+    text-align: center;
+  }
+
+  .offer-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .offer-card h3 {
+    font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .offer-card p {
+    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+    line-height: 1.5;
+  }
+
+  .progression-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .progression-card {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.2rem;
+    background: var(--surface);
+  }
+
+  .progression-card h3 {
+    font-size: clamp(0.8rem, 1.1vw, 0.9rem);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+  }
+
+  .progression-card p {
+    font-size: clamp(0.85rem, 1.3vw, 1rem);
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+  }
+
+  .progression-card .desc {
+    font-size: clamp(0.75rem, 1vw, 0.85rem);
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .note {
+    margin-top: 1.5rem;
+    font-size: clamp(0.8rem, 1.2vw, 0.95rem);
+    color: var(--muted);
+    font-style: italic;
+    line-height: 1.6;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 900px) {
+    .three-col, .scope-grid, .offer-grid { grid-template-columns: 1fr; }
+    .four-col { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 700px) {
+    .two-col, .team-grid, .workshop-grid, .progression-grid { grid-template-columns: 1fr; }
+    .four-col { grid-template-columns: 1fr; }
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    body { overflow-y: auto; overflow-x: hidden; }
+    .deck { height: auto; min-height: 100vh; }
+
+    .slide {
+      position: relative;
+      display: none;
+      padding: 4rem 1.5rem 5rem;
+      min-height: auto;
+      height: auto;
+      justify-content: flex-start;
+      overflow-y: visible;
+    }
+    .slide.active { display: flex; opacity: 1; }
+
+    h1 { font-size: 1.8rem; margin-bottom: 1rem; }
+    h2 { font-size: 1.4rem; margin-bottom: 1rem; }
+    p, li { font-size: 0.95rem; line-height: 1.6; }
+
+    .big-number { display: none; }
+
+    .tag { font-size: 0.65rem; padding: 0.2rem 0.6rem; margin-bottom: 1rem; }
+
+    .site-logo { display: none !important; }
+    .theme-toggle { top: 0.8rem; right: 1rem; font-size: 0.6rem; padding: 0.3rem 0.6rem; }
+    .nav-bar { padding: 0.6rem 1rem; }
+    .nav-bar .slide-number { font-size: 0.7rem; }
+    .nav-btn { font-size: 0.75rem; padding: 0.6rem 1rem; min-width: 4.5rem; }
+
+    table { font-size: 0.75rem; }
+    th, td { padding: 0.4rem 0.5rem; }
+
+    .two-col { grid-template-columns: 1fr; gap: 1rem; }
+    .three-col { grid-template-columns: 1fr; gap: 1rem; }
+    .four-col { grid-template-columns: 1fr; gap: 1rem; }
+
+    .team-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .team-card { padding: 1rem; }
+
+    .scope-grid { grid-template-columns: 1fr; }
+    .offer-grid { grid-template-columns: 1fr; }
+    .workshop-grid { grid-template-columns: 1fr; }
+    .progression-grid { grid-template-columns: 1fr; }
+
+    .plan-card { padding: 0.8rem; }
+    .plan-total { font-size: 1.3rem; }
+    .plan-tagline { font-size: 0.85rem; }
+    .plan-desc { font-size: 0.7rem; }
+    .plan-badge { font-size: 0.55rem; }
+
+    .divider { margin: 1rem 0; }
+    .note { font-size: 0.75rem; }
+
+    .progress { height: 3px; }
+  }
+</style>
+</head>
+<body>
+
+<img src="logo.png" alt="Kwartz" class="site-logo" style="position: fixed; top: 1.2rem; left: 1.5rem; width: 56px; height: 56px; object-fit: contain; z-index: 200;">
+<button class="theme-toggle" id="themeToggle">Light</button>
+<div class="progress" id="progress"></div>
+
+<div class="deck" id="deck">
+
+  <!-- Slide 1: Title -->
+  <div class="slide active">
+    <div class="tag">Kwartz Consulting</div>
+    <h1>Your Dedicated<br><span class="accent">AI Enablement Team</span></h1>
+    <div class="divider" style="background: #f59e0b;"></div>
+    <p>Helping everyday businesses run leaner and earn more with AI.</p>
+  </div>
+
+  <!-- Slide 2: About Us -->
+  <div class="slide">
+    <div class="big-number">01</div>
+    <div class="tag">About Us</div>
+    <h2>AI for<br><span class="accent">Real Businesses</span></h2>
+    <ul>
+      <li>Whether you're running a family business or a growing SMB, you don't need a large team or a big budget to benefit from AI</li>
+      <li>Kwartz works alongside you to find simple, practical ways to <strong class="accent">save time, reduce costs, and free you up</strong> to focus on what matters most</li>
+      <li>From automating repetitive tasks to streamlining customer service and sales, we help you unlock efficiency that used to be reserved for large corporations &mdash; <strong class="accent">at a fraction of the cost</strong></li>
+    </ul>
+  </div>
+
+  <!-- Slide 3: The Team -->
+  <div class="slide">
+    <div class="big-number">02</div>
+    <div class="tag">The Team</div>
+    <h2>Who<br><span class="accent">We Are</span></h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <h3>Abhinav Gujjar</h3>
+        <p>Entrepreneur and technologist with <strong style="color: var(--text);">24+ years</strong> across software development and technology roles in enterprises and startups. Chief Software Architect at Tricog (healthcare startup) until 2022. Passionate about workplace efficiencies, AI, and manufacturing.</p>
+        <br>
+        <a href="https://www.linkedin.com/in/abhinavgujjar/" target="_blank">linkedin.com/in/abhinavgujjar</a>
+      </div>
+      <div class="team-card">
+        <h3>Kiran Menon</h3>
+        <p>Entrepreneur and product leader with <strong style="color: var(--text);">22+ years</strong> spanning tech &amp; software. Co-Founder &amp; CEO of Tydy (acquired by Phenom). Serial entrepreneur with parallel initiatives in kids' education, podcasting, and play-based learning.</p>
+        <br>
+        <a href="https://www.linkedin.com/in/kiranmenon/" target="_blank">linkedin.com/in/kiranmenon</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 4: What We Offer -->
+  <div class="slide">
+    <div class="big-number">03</div>
+    <div class="tag">What We Offer</div>
+    <h2>Three Pillars of<br><span class="accent">AI Enablement</span></h2>
+    <div class="offer-grid">
+      <div class="offer-card">
+        <div class="offer-number">1</div>
+        <h3>AI Workshops &amp; Training</h3>
+        <p>Hands-on, jargon-free sessions built for small and family business owners. Walk away with a clear picture of your AI opportunities and a roadmap you can act on immediately.</p>
+      </div>
+      <div class="offer-card">
+        <div class="offer-number">2</div>
+        <h3>AI &amp; Automation Discovery &amp; Implementation</h3>
+        <p>Not just workshops and powerpoints. We design, develop and implement AI-led solutions for your functions and your organisation as a whole.</p>
+      </div>
+      <div class="offer-card">
+        <div class="offer-number">3</div>
+        <h3>Tools</h3>
+        <p>We build tools specific to your organisation's needs &mdash; managing access, roles, and relationships to ensure your data stays yours.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 5: AI Workshops -->
+  <div class="slide" style="padding: 5vw 7vw;">
+    <div class="big-number">04</div>
+    <div class="tag">Workshops</div>
+    <h2>AI Workshop<br><span class="accent">Types</span></h2>
+    <div class="workshop-grid">
+      <div class="workshop-card">
+        <h3>AI Readiness Assessment</h3>
+        <p>A half-day session to map where AI can have the highest impact &mdash; we audit your current tools, workflows, and data to build a prioritised opportunity roadmap.</p>
+      </div>
+      <div class="workshop-card">
+        <h3>AI 101 for Business Leaders</h3>
+        <p>A foundational workshop demystifying AI for non-technical executives &mdash; covering what's real, what's hype, and what decisions you need to make now.</p>
+      </div>
+      <div class="workshop-card">
+        <h3>Function Leader Workshops</h3>
+        <p>Deep dive into team processes &mdash; sales, marketing, supply chain, finance. Identify specific AI opportunities within each function.</p>
+      </div>
+      <div class="workshop-card">
+        <h3>Build Your AI Roadmap</h3>
+        <p>A structured full-day workshop for leadership teams to define their 12-month AI strategy &mdash; covering use case prioritisation, build-vs-buy, and change management.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 6: AI Automation Scope -->
+  <div class="slide" style="padding: 5vw 7vw;">
+    <div class="big-number">05</div>
+    <div class="tag">Automation Scope</div>
+    <h2>What AI Can<br><span class="accent">Automate</span></h2>
+    <div class="scope-grid">
+      <div class="scope-card">
+        <h3 style="color: #a855f7;">Strategy &amp; Leadership</h3>
+        <ul>
+          <li>Competitive intelligence monitoring</li>
+          <li>Meeting summarisation &amp; action items</li>
+          <li>Market research synthesis</li>
+          <li>CEO / MD natural language dashboards</li>
+        </ul>
+      </div>
+      <div class="scope-card">
+        <h3 style="color: #22d3ee;">Finance &amp; Accounting</h3>
+        <ul>
+          <li>Invoice processing &amp; classification</li>
+          <li>Expense categorisation</li>
+          <li>Cash flow forecasting</li>
+          <li>Anomaly detection &amp; fraud flagging</li>
+          <li>Financial report summarisation</li>
+        </ul>
+      </div>
+      <div class="scope-card">
+        <h3 style="color: #10b981;">Operations &amp; Supply Chain</h3>
+        <ul>
+          <li>Demand forecasting</li>
+          <li>Vendor management &amp; contract tracking</li>
+          <li>Process documentation &amp; SOPs</li>
+          <li>Predictive maintenance</li>
+          <li>Order management automation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 7: More Automation -->
+  <div class="slide" style="padding: 5vw 7vw;">
+    <div class="big-number">06</div>
+    <div class="tag">Automation Scope</div>
+    <h2>Across Every<br><span class="accent">Function</span></h2>
+    <div class="scope-grid">
+      <div class="scope-card">
+        <h3 style="color: #ec4899;">Sales &amp; Revenue</h3>
+        <ul>
+          <li>Outbound personalisation</li>
+          <li>CRM auto-fill</li>
+          <li>Sales forecasting</li>
+          <li>Proposal generation</li>
+        </ul>
+      </div>
+      <div class="scope-card">
+        <h3 style="color: #f59e0b;">Marketing</h3>
+        <ul>
+          <li>Content generation at scale</li>
+          <li>SEO optimisation</li>
+          <li>Email campaign automation</li>
+          <li>Customer segmentation</li>
+          <li>Chatbots &amp; website assistants</li>
+        </ul>
+      </div>
+      <div class="scope-card">
+        <h3 style="color: #8b5cf6;">HR &amp; People Ops</h3>
+        <ul>
+          <li>Resume screening &amp; ranking</li>
+          <li>Job description writing</li>
+          <li>Onboarding assistant</li>
+          <li>Employee feedback analysis</li>
+          <li>Scheduling &amp; shift optimisation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 8: Tools - Cadence -->
+  <div class="slide">
+    <div class="big-number">07</div>
+    <div class="tag">Our Tools</div>
+    <h2>Purpose-Built<br><span class="accent">Tools</span></h2>
+    <div class="tool-card">
+      <h3 style="color: #a855f7;">Cadence</h3>
+      <p>Automate and run business processes with approvals and access management made easy for businesses that do not have large IT teams. Workflows, escalations, and audit trails out of the box.</p>
+    </div>
+    <div class="tool-card">
+      <h3 style="color: #f59e0b;">Optimize</h3>
+      <p>Save token costs with our connector for large document conversion between HTML, PDF, DOCX, and Markdown. Converts documents into the most efficient format before they hit the AI.</p>
+    </div>
+    <div class="tool-card">
+      <h3 style="color: #22d3ee;">Custom Connectors</h3>
+      <p>Save token costs with purpose-built connectors for large document conversion and data integration across your systems.</p>
+    </div>
+  </div>
+
+  <!-- Slide 9: Gatekeeper -->
+  <div class="slide" style="padding: 5vw 7vw;">
+    <div class="big-number">08</div>
+    <div class="tag">Gatekeeper</div>
+    <h2>Secure Access Control<br>for <span class="accent">Your Data</span></h2>
+    <p style="margin-bottom: 1rem;">One dashboard to manage AI data access across your organisation. Gatekeeper sits between your people and your data &mdash; every time an AI tool requests information, Gatekeeper checks: does this person have permission?</p>
+    <div class="two-col">
+      <div>
+        <h3 style="color: #10b981;">How It Works</h3>
+        <ul>
+          <li><strong class="accent">Define Privileges</strong> &mdash; create named access levels (Sales Viewer, Production Manager, Finance Team)</li>
+          <li><strong class="accent">Assign to People</strong> &mdash; give each person only the privileges they need</li>
+          <li><strong class="accent">Adjust Anytime</strong> &mdash; changes take effect immediately, no restarts</li>
+        </ul>
+      </div>
+      <div>
+        <h3 style="color: #f59e0b;">Key Benefits</h3>
+        <ul>
+          <li><strong class="accent">Least-privilege access</strong> &mdash; people only see what their role requires</li>
+          <li><strong class="accent">Centralised control</strong> &mdash; one dashboard for all data sources</li>
+          <li><strong class="accent">Zero friction</strong> &mdash; works silently in the background</li>
+          <li><strong class="accent">No data stored</strong> &mdash; only manages permissions, never sees your data</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 10: Gatekeeper Dashboard -->
+  <div class="slide">
+    <div class="big-number">09</div>
+    <div class="tag">Gatekeeper</div>
+    <h2>What You See in the<br><span class="accent">Dashboard</span></h2>
+    <ul>
+      <li><strong class="accent">Apps</strong> &mdash; each data source connected to Gatekeeper. See exactly what data points each source exposes.</li>
+      <li><strong class="accent">Privileges</strong> &mdash; your access bundles. See which data points are in each privilege and how many people have it.</li>
+      <li><strong class="accent">Users</strong> &mdash; your team. See what privileges each person has and the full list of data they can access.</li>
+      <li><strong class="accent">Change Log</strong> &mdash; when a data source updates, see a clear summary of what changed. Review and dismiss when satisfied.</li>
+    </ul>
+    <p class="note">Authentication via Clerk. Every data request checked against your permission rules. Gatekeeper never sees, stores, or caches your actual business data. Stale permissions automatically cleaned up.</p>
+  </div>
+
+  <!-- Slide 11: Engagement Packages Overview -->
+  <div class="slide" style="padding: 4vw 4vw;">
+    <div class="tag">Engagement Packages</div>
+    <h2>Fixed-Fee, 3-Month<br><span class="accent">Engagements</span></h2>
+    <div class="four-col">
+      <div class="plan-card">
+        <h3>Starter</h3>
+        <p class="plan-tagline">"Show me what AI can do"</p>
+        <div class="plan-total">&#x20B9;5L</div>
+        <p class="plan-desc">1 department audit<br>Executive training (15 ppl)<br>1 working workflow<br>Pilot results report</p>
+      </div>
+      <div class="plan-card recommended">
+        <h3>Foundation <span class="plan-badge">Popular</span></h3>
+        <p class="plan-tagline" style="color: #10b981;">"Fix our data first"</p>
+        <div class="plan-total" style="color: #10b981;">&#x20B9;10L</div>
+        <p class="plan-desc">2&ndash;3 dept audit<br>Full data strategy<br>Integration setup<br>1 proof-of-concept workflow</p>
+      </div>
+      <div class="plan-card">
+        <h3>Build</h3>
+        <p class="plan-tagline" style="color: #a855f7;">"Build it and ship it"</p>
+        <div class="plan-total" style="color: #a855f7;">&#x20B9;15L</div>
+        <p class="plan-desc">4&ndash;6 workflows built<br>2 departments<br>Training for 30 users<br>Handover + 2wk support</p>
+      </div>
+      <div class="plan-card">
+        <h3>Scale</h3>
+        <p class="plan-tagline" style="color: #ec4899;">"Roll out org-wide"</p>
+        <div class="plan-total" style="color: #ec4899;">&#x20B9;25L</div>
+        <p class="plan-desc">8&ndash;12 workflows<br>3&ndash;5 departments<br>75 users trained<br>1 month managed support</p>
+      </div>
+    </div>
+    <p class="note">All packages are fixed-fee, 3-month engagements designed for your business.</p>
+  </div>
+
+  <!-- Slide 12: Starter Detail -->
+  <div class="slide">
+    <div class="big-number">11</div>
+    <div class="tag">Starter &mdash; &#x20B9;5,00,000</div>
+    <h2>"Show me what AI can<br><span class="accent">actually do</span>"</h2>
+    <ul>
+      <li><strong style="color: #a855f7;">Month 1 &mdash; Executive Training:</strong> Full-day workshop for up to 15 people &mdash; leadership + dept heads. Live demos with their business context.</li>
+      <li><strong style="color: #22d3ee;">Month 1&ndash;2 &mdash; Focused Audit:</strong> Deep-dive into 1 department (up to 30 employees). Workflow mapping, data readiness, AI opportunity scoring.</li>
+      <li><strong style="color: #10b981;">Month 3 &mdash; Quick Win Pilot:</strong> Build 1 working workflow for the top use case. Pilot with 3&ndash;5 person team. Measure real impact.</li>
+    </ul>
+    <p class="note">Deliverables: Post-training report &bull; AI Readiness Report &bull; Working workflow &bull; Pilot results &bull; Next steps recommendation</p>
+  </div>
+
+  <!-- Slide 13: Foundation Detail -->
+  <div class="slide">
+    <div class="big-number">12</div>
+    <div class="tag">Foundation &mdash; &#x20B9;10,00,000</div>
+    <h2>"Fix our data so AI<br><span class="accent">actually works</span>"</h2>
+    <ul>
+      <li><strong style="color: #a855f7;">Month 1 &mdash; Multi-Dept Audit:</strong> Audit 2&ndash;3 departments (up to 50 employees each). Workflows, data sources, readiness scoring.</li>
+      <li><strong style="color: #22d3ee;">Month 1&ndash;2 &mdash; Data Strategy:</strong> Full data audit &mdash; what's digital, accessible, locked away. Design organisation &amp; governance plan.</li>
+      <li><strong style="color: #10b981;">Month 2&ndash;3 &mdash; Data Setup:</strong> Organise key data sources. Set up integrations (Drive, email, ERP). Establish access patterns.</li>
+      <li><strong style="color: #f59e0b;">Month 3 &mdash; Proof of Concept:</strong> 1 working workflow using the newly organised data, proving the strategy works.</li>
+    </ul>
+    <p class="note">Deliverables: AI Readiness Reports &bull; Data Strategy Doc &bull; Working integrations &bull; Governance playbook &bull; Implementation roadmap</p>
+  </div>
+
+  <!-- Slide 14: Build Detail -->
+  <div class="slide">
+    <div class="big-number">13</div>
+    <div class="tag">Build &mdash; &#x20B9;15,00,000</div>
+    <h2>"Build it and get<br>our team <span class="accent">using it</span>"</h2>
+    <ul>
+      <li><strong style="color: #a855f7;">Month 1 &mdash; Solution Design:</strong> Architect 4&ndash;6 workflows across 2 departments. Define skills, integrations, automation needs.</li>
+      <li><strong style="color: #22d3ee;">Month 1&ndash;3 &mdash; Implementation:</strong> Build custom skills, MCP integrations, scheduled tasks, plugins. Deploy, test with real users, refine.</li>
+      <li><strong style="color: #10b981;">Month 2&ndash;3 &mdash; Team Training:</strong> Hands-on training for up to 30 users. Not a demo &mdash; people practice with their actual workflows.</li>
+      <li><strong style="color: #f59e0b;">Month 3 &mdash; Handover:</strong> Internal runbooks, workflow docs, admin training. 2-week post-handover support buffer included.</li>
+    </ul>
+    <p class="note">Delivery model: Full build (we do everything) | Hybrid (we build v1, train your team) | Guided (we architect, you build)</p>
+  </div>
+
+  <!-- Slide 15: Scale Detail -->
+  <div class="slide">
+    <div class="big-number">14</div>
+    <div class="tag">Scale &mdash; &#x20B9;25,00,000</div>
+    <h2>"Roll it out across<br>the <span class="accent">organisation</span>"</h2>
+    <ul>
+      <li><strong style="color: #a855f7;">Expansion Audit</strong> &mdash; rapid audit of 3&ndash;5 new departments</li>
+      <li><strong style="color: #22d3ee;">8&ndash;12 Workflows</strong> &mdash; built across multiple departments</li>
+      <li><strong style="color: #10b981;">75 Users Trained</strong> &mdash; includes train-the-trainer programme</li>
+      <li><strong style="color: #f59e0b;">Adoption Framework</strong> &mdash; usage tracking + AI champion network</li>
+      <li><strong style="color: #ec4899;">1 Month Support</strong> &mdash; managed ops transition included</li>
+    </ul>
+  </div>
+
+  <!-- Slide 16: Package Comparison -->
+  <div class="slide" style="padding: 5vw 6vw;">
+    <div class="big-number">15</div>
+    <div class="tag">Comparison</div>
+    <h2>Package<br><span class="accent">Comparison</span></h2>
+    <table>
+      <tr>
+        <th></th>
+        <th>Starter</th>
+        <th>Foundation</th>
+        <th>Build</th>
+        <th>Scale</th>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">Price</td>
+        <td>&#x20B9;5L</td>
+        <td>&#x20B9;10L</td>
+        <td>&#x20B9;15L</td>
+        <td>&#x20B9;25L</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">Duration</td>
+        <td>3 months</td>
+        <td>3 months</td>
+        <td>3 months</td>
+        <td>3 months</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">Departments</td>
+        <td>1</td>
+        <td>2&ndash;3</td>
+        <td>2</td>
+        <td>3&ndash;5</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">Training</td>
+        <td>15 people</td>
+        <td>&mdash;</td>
+        <td>30 people</td>
+        <td>75 people</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">Workflows</td>
+        <td>1</td>
+        <td>1</td>
+        <td>4&ndash;6</td>
+        <td>8&ndash;12</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">Data Strategy</td>
+        <td>&mdash;</td>
+        <td>Full</td>
+        <td>&mdash;</td>
+        <td>Extended</td>
+      </tr>
+      <tr>
+        <td style="color: var(--text); font-weight: 500;">Post-support</td>
+        <td>&mdash;</td>
+        <td>&mdash;</td>
+        <td>2 weeks</td>
+        <td>1 month</td>
+      </tr>
+    </table>
+    <p class="note">Add-ons available: Additional dept audit (&#x20B9;1L) | Extra training session (&#x20B9;50K) | Additional workflow (&#x20B9;75K&ndash;1.5L) | Managed Ops retainer (from &#x20B9;1.5L/mo)</p>
+  </div>
+
+  <!-- Slide 17: How Clients Progress -->
+  <div class="slide">
+    <div class="big-number">16</div>
+    <div class="tag">Client Journeys</div>
+    <h2>How Clients<br><span class="accent">Typically Progress</span></h2>
+    <div class="progression-grid">
+      <div class="progression-card">
+        <h3 style="color: #10b981;">Most Common</h3>
+        <p>Starter &rarr; Build &rarr; Managed Ops</p>
+        <span class="desc">3 months to prove value, 3 months to build, then ongoing support.</span>
+      </div>
+      <div class="progression-card">
+        <h3 style="color: #22d3ee;">Data-Heavy Industries</h3>
+        <p>Starter &rarr; Foundation &rarr; Build</p>
+        <span class="desc">Need the data cleanup step before building can begin.</span>
+      </div>
+      <div class="progression-card">
+        <h3 style="color: #a855f7;">Fast Movers</h3>
+        <p>Build &rarr; Scale &rarr; Managed Ops</p>
+        <span class="desc">Already have buy-in and data &mdash; just need execution.</span>
+      </div>
+      <div class="progression-card">
+        <h3 style="color: #f59e0b;">Enterprise Rollout</h3>
+        <p>Foundation &rarr; Scale &rarr; Managed Ops</p>
+        <span class="desc">Large organisations that need data strategy before going wide.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 18: Let's Talk -->
+  <div class="slide">
+    <div class="tag">Get Started</div>
+    <h1>Let's<br><span style="color: #10b981;">talk</span></h1>
+    <div class="divider" style="background: #10b981;"></div>
+    <ul>
+      <li>Which areas of your business do you want to start with?</li>
+      <li>What does your team's readiness for AI look like today?</li>
+      <li>Which package feels like the right starting point?</li>
+    </ul>
+    <p style="margin-top: 2rem; color: var(--text); font-size: clamp(1rem, 1.6vw, 1.2rem); display: flex; align-items: center; gap: 0.8rem;">
+      <span>Kwartz Consulting &mdash; Your Dedicated AI Enablement Team</span>
+    </p>
+  </div>
+
+</div>
+
+<div class="nav-bar">
+  <button class="nav-btn" id="prevBtn" onclick="goTo(current - 1)">&larr; Prev</button>
+  <div class="slide-number" id="slideNumber">1 / 18</div>
+  <button class="nav-btn" id="nextBtn" onclick="goTo(current + 1)">Next &rarr;</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const progress = document.getElementById('progress');
+  const slideNumber = document.getElementById('slideNumber');
+  let current = 0;
+
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+
+  function goTo(n) {
+    if (n < 0 || n >= slides.length) return;
+    slides[current].classList.remove('active');
+    current = n;
+    slides[current].classList.add('active');
+    progress.style.width = ((current + 1) / slides.length * 100) + '%';
+    slideNumber.textContent = (current + 1) + ' / ' + slides.length;
+    prevBtn.style.visibility = current === 0 ? 'hidden' : 'visible';
+    nextBtn.style.visibility = current === slides.length - 1 ? 'hidden' : 'visible';
+    location.hash = current + 1;
+    window.scrollTo(0, 0);
+  }
+
+  const themeToggle = document.getElementById('themeToggle');
+  const savedTheme = localStorage.getItem('deckTheme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  themeToggle.textContent = savedTheme === 'dark' ? 'Light' : 'Dark';
+
+  themeToggle.addEventListener('click', () => {
+    const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('deckTheme', t);
+    themeToggle.textContent = t === 'dark' ? 'Light' : 'Dark';
+  });
+
+  const hash = parseInt(location.hash.replace('#', ''), 10);
+  if (hash >= 1 && hash <= slides.length) goTo(hash - 1);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      goTo(current + 1);
+    }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      goTo(current - 1);
+    }
+    if (e.key === 'Home') goTo(0);
+    if (e.key === 'End') goTo(slides.length - 1);
+    if (e.key === 't' || e.key === 'T') themeToggle.click();
+  });
+
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  });
+  document.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) diff > 0 ? goTo(current + 1) : goTo(current - 1);
+  });
+</script>
+
+</body>
+</html>
